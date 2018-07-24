@@ -1,0 +1,47 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: monospace;
+  background: radial-gradient(at center, lightgreen, lightyellow) no-repeat fixed;
+}
+
+#github {
+  margin: 20px;
+}
+
+#github div h1, #github h2 {
+  text-align: center;
+  text-shadow: 1px 1px 2px darkgreen;
+  color: rgba(60, 60, 30, .7);
+  padding: 25px 0;
+}
+
+#github > label {
+  margin: 25px;
+}
+
+#github-buttons {
+  font-size: 1.2em;
+}
+
+#github-buttons input{
+  margin-left: 25px;
+}
+
+a {
+  text-decoration: none;
+  color: #f66;
+}
+
+li {
+  line-height: 1,5em;
+  margin-bottom: 20px;
+}
+
+.author, .date {
+  font-weight: bold;
+}
