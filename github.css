@@ -2,11 +2,13 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
+  text-shadow: 1px 1px 1px bisque;
+  color: rgba(30, 30, 15, .7);
 }
 
 body {
   font-family: monospace;
-  background: radial-gradient(at center, lightgreen, lightyellow) no-repeat fixed;
+  background: radial-gradient(at center, rgba(0,200,0,.1), rgba(128,128,0,.1)) no-repeat fixed;
 }
 
 #github {
@@ -14,10 +16,7 @@ body {
 }
 
 #github div h1, #github h2 {
-  text-align: center;
-  text-shadow: 1px 1px 2px darkgreen;
-  color: rgba(60, 60, 30, .7);
-  padding: 25px 0;
+  padding: 25px;
 }
 
 #github > label {
@@ -40,6 +39,7 @@ a {
 li {
   line-height: 1,5em;
   margin-bottom: 20px;
+  color: black;
 }
 
 .author, .date {
