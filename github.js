@@ -11,7 +11,7 @@ const store = new Vuex.Store({
     project: "",
     branches: [],
     currentBranch: '',
-    count: "",
+    count: 3,
     commits: null,
 
     // populars table store
@@ -33,16 +33,25 @@ const store = new Vuex.Store({
 
   mutations: {
     // git commits mutations
-    setBranch: (state, branch) => state.currentBranch = branch,
+    setBranch: (state, branch) => {
+      if (state.currentBranch != branch) state.currentBranch = branch;
+      else state.count++
+    },
     setBranchesList: (state, branches) => state.branches = branches,
     setCommits: (state, commits) => state.commits = commits,
-    setCount: (state, count) => state.count = count || "1",
+    setCount: (state, count) => state.count = +count || 1,
     setName: (state, name) => state.user = name,
     setProject: (state, project) => state.project = project,
     setProjectsList: (state, projects) => state.projects = projects,
 
     // popular table mutations
-    setQuery: (state, query) => state.popSearchQuery = query
+    setQuery: (state, query) => state.popSearchQuery = query,
+    addRepos: (state, rep) => {
+      let name = state.user.toLowerCase();
+        for (let rep of state.popRepos)
+          if (rep.name.toLowerCase() === name) return;
+      state.popRepos.push({ name: state.user, repos: rep });
+    },
   },
 
   actions: {
@@ -52,9 +61,7 @@ const store = new Vuex.Store({
     inputName: ({commit}, value) => {
       commit('setName', value);
       commit('setBranchesList', []);
-      commit('setBranch', 'master');
       commit('setProjectsList', []);
-      commit('setProject', '');
       commit('setCommits', null);
     },
     inputProject: ({commit}, value) => commit('setProject', value),
@@ -65,18 +72,25 @@ const store = new Vuex.Store({
         case 1:
           fetch(url[0])
             .then(response => response.json())
-              .then(response => commit('setProjectsList', response.map(item => item.name)))
+              .then(response => {
+                commit('setProjectsList', response.map(item => item.name));
+                commit('addRepos', response.length);
+              })
           return;
 
         case 2:
           fetch(url[0])
             .then(response => response.json())
-              .then(response => commit('setBranchesList', response.map(item => item.name)))
-                .then(response => {
-                  fetch(url[0].slice(0, -8) + "commits")
-                    .then(response => response.json())
-                      .then(response => commit('setCommits', response));
-                });
+              .then(response => {
+                let branches;
+                try {
+                  branches = response.map(item => item.name);
+                } catch (e) {
+                  branches = [response.name]
+                }
+                commit('setBranchesList', branches)
+                commit('setBranch', branches[0])
+              })
           return;
 
         case 3:
@@ -143,7 +157,7 @@ const githubCommits = {
         <br> by 
         <span class="author">
           <a
-            :href="record.author.html_url"
+            :href="record.author ? record.author.html_url : ''"
             target="_blank">
             {{ record.commit.author.name }}
           </a>
@@ -259,6 +273,7 @@ const github = new Vue({
       projects: state => state.projects,
       project: state => state.project,
       count: state => state.count,
+      commits: state => state.commits,
 
       // popular repos state
       query: state => state.popSearchQuery,
@@ -326,7 +341,7 @@ const github = new Vue({
 
   template: `
     <div id="github">
-      <div v-if="project">
+      <div v-if="project && commits">
         <h1>Latest "{{project | capitalize }}" commits</h1>
       </div>
       <h2 v-else>Choose user and project to start!</h2>
@@ -357,7 +372,7 @@ const github = new Vue({
             id="project-select"
             :value="project"
             @change="setProject($event.target.value)">
-            <option disabled selected value="">Choose project</option>
+            <option disabled selected :value="project">Choose project</option>
             <option
               v-for="proj in projects"
               :key="proj"
